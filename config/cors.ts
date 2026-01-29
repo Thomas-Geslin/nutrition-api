@@ -1,17 +1,30 @@
 import { defineConfig } from '@adonisjs/cors'
 
 /**
- * Configuration options to tweak the CORS policy. The following
- * options are documented on the official documentation website.
+ * Configuration CORS pour accepter le frontend Next.js
+ * En production, remplacer localhost:3000 par votre domaine réel
  *
  * https://docs.adonisjs.com/guides/security/cors
  */
 const corsConfig = defineConfig({
   enabled: true,
-  origin: true,
-  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE'],
+
+  // Origines autorisées (Next.js en développement)
+  origin: (origin) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+    ]
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      return true
+    }
+
+    return false
+  },
+
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH'],
   headers: true,
-  exposeHeaders: [],
+  exposeHeaders: ['Authorization'],
   credentials: true,
   maxAge: 90,
 })
