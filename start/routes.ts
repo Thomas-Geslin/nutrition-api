@@ -10,17 +10,11 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
+/**
+ * Authentication enpoint
+ */
 const AuthController = () => import('#controllers/auth')
 
-router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
-})
-
-/**
- * Routes d'authentification
- */
 router
   .group(() => {
     router.post('/register', [AuthController, 'register'])
@@ -29,3 +23,10 @@ router
     router.get('/getLoggedUserInfo', [AuthController, 'getLoggedUserInfo']).use(middleware.auth())
   })
   .prefix('/auth')
+
+/**
+ * Onboarding enpoint
+ */
+const OnboardingController = () => import('#controllers/onboarding')
+
+router.post('/onboarding/submit', [OnboardingController, 'submitOnboarding']).use(middleware.auth())
