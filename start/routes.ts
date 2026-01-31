@@ -30,3 +30,14 @@ router
 const OnboardingController = () => import('#controllers/onboarding')
 
 router.post('/onboarding/submit', [OnboardingController, 'submitOnboarding']).use(middleware.auth())
+
+/**
+ * User endpoint
+ */
+const UserController = () => import('#controllers/user')
+
+router
+  .group(() => {
+    router.patch('/update', [UserController, 'updateUser']).use(middleware.auth())
+  })
+  .prefix('/user')
