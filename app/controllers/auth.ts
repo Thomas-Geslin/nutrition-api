@@ -61,11 +61,7 @@ export default class AuthController {
 
       return response.ok({
         message: 'Logged successfully',
-        user: {
-          id: user.id,
-          email: user.email,
-          fullName: user.fullName,
-        },
+        user,
         token: {
           type: 'bearer',
           value: token.value!.release(),
@@ -112,13 +108,7 @@ export default class AuthController {
     const user = auth.getUserOrFail()
 
     return response.ok({
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
+      user,
     })
   }
 }
