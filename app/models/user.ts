@@ -50,6 +50,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ columnName: 'onboarding_completed' })
   declare onboardingCompleted: boolean
 
+  @column({ columnName: 'google_id' })
+  declare googleId: string
+
   @column.dateTime({ columnName: 'created_at', autoCreate: true })
   declare createdAt: DateTime
 

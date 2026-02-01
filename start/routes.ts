@@ -25,6 +25,16 @@ router
   .prefix('/auth')
 
 /**
+ * Google OAuth enpoint
+ */
+router
+  .group(() => {
+    router.get('/redirect', [AuthController, 'googleRedirect'])
+    router.get('/callback', [AuthController, 'googleCallback'])
+  })
+  .prefix('/google')
+
+/**
  * Onboarding enpoint
  */
 const OnboardingController = () => import('#controllers/onboarding')
