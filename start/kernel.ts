@@ -39,5 +39,16 @@ router.use([() => import('@adonisjs/core/bodyparser_middleware'), () => import('
  * the routes or the routes group.
  */
 export const middleware = router.named({
-  auth: () => import('#middleware/auth_middleware')
+  /**
+   * Middleware to extracte JWT cookie from HttpOnly
+   * and place it into the Authorization header.
+   * To be used BEFORE the auth middleware on protected endpoint.
+   */
+  cookieAuth: () => import('#middleware/cookie_auth_middleware'),
+
+  /**
+   * Standard Adonis auth middleware
+   * Verify token validity from Authoziration header
+   */
+  auth: () => import('#middleware/auth_middleware'),
 })
