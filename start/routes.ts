@@ -5,6 +5,7 @@ import { middleware } from './kernel.js'
  * Authentication endpoints
  */
 const AuthController = () => import('#controllers/auth')
+const PasswordResetController = () => import('#controllers/password_reset')
 
 router
   .group(() => {
@@ -17,6 +18,10 @@ router
     router
       .get('/getLoggedUserInfo', [AuthController, 'getLoggedUserInfo'])
       .use([middleware.cookieAuth(), middleware.auth()])
+
+    // Password reset
+    router.post('/forgot-password', [PasswordResetController, 'forgotPassword'])
+    router.post('/reset-password', [PasswordResetController, 'resetPassword'])
   })
   .prefix('/auth')
 

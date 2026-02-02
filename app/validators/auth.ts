@@ -31,3 +31,27 @@ export const loginValidator = vine.compile(
     password: vine.string(),
   })
 )
+
+/**
+ * Validator pour la demande de réinitialisation de mot de passe
+ * - Email valide
+ */
+export const forgotPasswordValidator = vine.compile(
+  vine.object({
+    email: vine.string().email().normalizeEmail(),
+  })
+)
+
+/**
+ * Validator pour la réinitialisation du mot de passe
+ * - Token requis
+ * - Email valide
+ * - Nouveau mot de passe minimum 8 caractères
+ */
+export const resetPasswordValidator = vine.compile(
+  vine.object({
+    token: vine.string(),
+    email: vine.string().email().normalizeEmail(),
+    password: vine.string().minLength(8),
+  })
+)
