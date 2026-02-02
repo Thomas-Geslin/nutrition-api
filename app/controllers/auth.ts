@@ -17,11 +17,11 @@ export default class AuthController {
    */
   private setAuthCookie(response: HttpContext['response'], token: string) {
     response.cookie(AUTH_COOKIE_NAME, token, {
-      httpOnly: true, 
+      httpOnly: true,
       secure: app.inProduction, // HTTPS only in prod
       sameSite: 'lax', // CSRF Protection : no cookie present on cross-site request
       path: '/', // Cookie available on every endpoint
-      maxAge: COOKIE_MAX_AGE_SECONDS, 
+      maxAge: COOKIE_MAX_AGE_SECONDS,
     })
   }
 
@@ -114,7 +114,7 @@ export default class AuthController {
   }
 
   /**
-   * 
+   *
    * POST /auth/logout
    * Logout an user (Revoke token and delete cookie)
    */
@@ -205,7 +205,11 @@ export default class AuthController {
       // Put token in httpOnly cookie
       this.setAuthCookie(response, token.value!.release())
 
-      // Redirect to frontend with JWT
+      // Redirect to frontend
+      if (!user.onboardingCompleted) {
+        return response.redirect(`${FRONTEND_URL}/onboarding/profile`)
+      }
+
       return response.redirect(`${FRONTEND_URL}/dashboard`)
     } catch (err) {
       console.error('Google OAuth error:', err)
