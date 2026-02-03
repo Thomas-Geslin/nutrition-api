@@ -10,7 +10,6 @@ export const registerValidator = vine.compile(
     email: vine
       .string()
       .email()
-      .normalizeEmail()
       .unique(async (db, value) => {
         const user = await db.from('users').where('email', value).first()
         return !user
@@ -27,7 +26,7 @@ export const registerValidator = vine.compile(
  */
 export const loginValidator = vine.compile(
   vine.object({
-    email: vine.string().email().normalizeEmail(),
+    email: vine.string().email(),
     password: vine.string(),
   })
 )
@@ -38,7 +37,7 @@ export const loginValidator = vine.compile(
  */
 export const forgotPasswordValidator = vine.compile(
   vine.object({
-    email: vine.string().email().normalizeEmail(),
+    email: vine.string().email(),
   })
 )
 
@@ -51,7 +50,7 @@ export const forgotPasswordValidator = vine.compile(
 export const resetPasswordValidator = vine.compile(
   vine.object({
     token: vine.string(),
-    email: vine.string().email().normalizeEmail(),
+    email: vine.string().email(),
     password: vine.string().minLength(8),
   })
 )
