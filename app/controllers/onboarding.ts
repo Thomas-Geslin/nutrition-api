@@ -29,6 +29,7 @@ export default class OnboardingController {
           gender: profile.gender,
           height: profile.height,
           weight: profile.weight,
+          activityLevel: profile.activityLevel,
           dietaryRestrictions: profile.dietaryRestrictions,
           goal,
           likedFood,

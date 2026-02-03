@@ -14,6 +14,7 @@ export const userUpdateValidator = vine.compile(
     gender: vine.enum(['male', 'female', 'other']).optional(),
     height: vine.number().min(50).max(250).optional(),
     weight: vine.number().min(20).max(400).optional(),
+    activityLevel: vine.enum(['sedentary', 'light', 'moderate', 'active', 'very_active']).optional(),
     goal: vine.enum(['loss', 'maintenance', 'gain']).optional(),
 
     dietaryRestrictions: vine

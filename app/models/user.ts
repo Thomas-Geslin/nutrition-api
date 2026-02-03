@@ -35,6 +35,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare weight: number | null
 
+  @column({ columnName: 'activity_level' })
+  declare activityLevel: string | null
+
   @column({ columnName: 'dietary_restrictions' })
   declare dietaryRestrictions: string[]
 
