@@ -15,13 +15,13 @@ export default class AuthController {
   /**
    * Set authentication cookie function
    */
-  private setAuthCookie(response: HttpContext['response'], token: string) {
+  private setAuthCookie(response: HttpContext['response'], token: string, rememberMe = true) {
     response.cookie(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: app.inProduction, // HTTPS only in prod
       sameSite: 'lax', // CSRF Protection : no cookie present on cross-site request
       path: '/', // Cookie available on every endpoint
-      maxAge: COOKIE_MAX_AGE_SECONDS,
+      maxAge: rememberMe ? COOKIE_MAX_AGE_SECONDS : undefined,
     })
   }
 
@@ -56,7 +56,7 @@ export default class AuthController {
       })
 
       // Put the token in a httpOnly cookie
-      this.setAuthCookie(response, token.value!.release())
+      this.setAuthCookie(response, token.value!.release(), true)
 
       return response.created({
         message: 'User successfully created',
@@ -84,16 +84,16 @@ export default class AuthController {
    */
   async login({ request, response }: HttpContext) {
     try {
-      const { email, password } = await request.validateUsing(loginValidator)
+      const { email, password, rememberMe } = await request.validateUsing(loginValidator)
 
       const user = await User.verifyCredentials(email, password)
 
       const token = await User.accessTokens.create(user, ['*'], {
-        expiresIn: '30 days',
+        expiresIn: rememberMe ? '30 days' : '1 days',
       })
 
       // Put the token in a httpOnly cookie
-      this.setAuthCookie(response, token.value!.release())
+      this.setAuthCookie(response, token.value!.release(), rememberMe)
 
       return response.ok({
         message: 'Logged successfully',
@@ -203,7 +203,7 @@ export default class AuthController {
       })
 
       // Put token in httpOnly cookie
-      this.setAuthCookie(response, token.value!.release())
+      this.setAuthCookie(response, token.value!.release(), true)
 
       // Redirect to frontend
       if (!user.onboardingCompleted) {
