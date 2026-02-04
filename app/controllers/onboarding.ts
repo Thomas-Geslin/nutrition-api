@@ -1,5 +1,8 @@
 import { onboardingValidator } from '#validators/onboarding'
 import { HttpContext } from '@adonisjs/core/http'
+import UserNutritionProfile from '#models/user_nutrition_profile'
+import UserFoodPreference from '#models/user_food_preferences'
+import NutritionCalculator from '#services/nutrition_calculator'
 
 export default class OnboardingController {
   /**
@@ -14,29 +17,40 @@ export default class OnboardingController {
 
       const { profile, goal, foodPreferences } = await request.validateUsing(onboardingValidator)
 
-      // Separate liked & unliked foods
-      const likedFood = foodPreferences
-        .filter((food) => food.type === 'INCLUDE')
-        .map((food) => food.foodId)
+      // Calculate nutrition metrics
+      const metrics = NutritionCalculator.calculateAll({
+        ...profile,
+        goal: goal,
+      })
 
-      const unlikedFood = foodPreferences
-        .filter((food) => food.type === 'EXCLUDE')
-        .map((food) => food.foodId)
+      // Create nutrition profile with calculated values
+      await UserNutritionProfile.create({
+        userId: user.id,
+        ...profile,
+        goal,
+        ...metrics,
+      })
 
-      await user
-        .merge({
-          age: profile.age,
-          gender: profile.gender,
-          height: profile.height,
-          weight: profile.weight,
-          activityLevel: profile.activityLevel,
-          dietaryRestrictions: profile.dietaryRestrictions,
-          goal,
-          likedFood,
-          unlikedFood,
-          onboardingCompleted: true,
-        })
-        .save()
+      // Create foodPrefences entries
+      const foodPreferencesData = foodPreferences
+        .filter((food) => food.type !== null)
+        .map((food) => ({
+          userId: user.id,
+          foodName: food.foodId,
+          liked: food.type === 'INCLUDE',
+        }))
+
+      if (foodPreferencesData.length > 0) {
+        await UserFoodPreference.createMany(foodPreferencesData)
+      }
+
+      // Mark onboarding as completed
+      user.onboardingCompleted = true
+      await user.save()
+
+      // Load relations for response
+      await user.load('nutritionProfile')
+      await user.load('foodPreferences')
 
       return response.ok({
         message: 'Onboarding completed successfully',

@@ -15,7 +15,7 @@ export const onboardingValidator = vine.compile(
   vine.object({
     profile: vine.object({
       age: vine.number().min(0).max(120),
-      gender: vine.enum(['male', 'female', 'other']),
+      gender: vine.enum(['male', 'female']),
       height: vine.number().min(50).max(250),
       weight: vine.number().min(20).max(400),
       activityLevel: vine.enum(['sedentary', 'light', 'moderate', 'active', 'very_active']),
@@ -24,7 +24,7 @@ export const onboardingValidator = vine.compile(
       ),
     }),
 
-    goal: vine.enum(['loss', 'maintenance', 'gain']),
+    goal: vine.enum(['cut', 'maintain', 'bulk']),
 
     foodPreferences: vine
       .array(

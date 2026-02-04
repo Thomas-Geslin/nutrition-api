@@ -137,15 +137,77 @@ export default class AuthController {
 
   /**
    * GET /auth/getLoggedUserInfo
-   * Send back authentified user data
+   * Send back authentified user data with nutrition profile and food preferences
    */
   async getLoggedUserInfo({ auth, response }: HttpContext) {
     await auth.authenticate()
 
     const user = auth.getUserOrFail()
 
+    // Preload nutrition profile and food preferences
+    await user.load('nutritionProfile')
+    await user.load('foodPreferences')
+
+    const nutritionProfile = user.nutritionProfile
+    const foodPreferences = user.foodPreferences
+
+    // TODO: refactor those return
+    // If onboarding not completed, return partial AuthUser
+    if (!user.onboardingCompleted) {
+      return response.ok({
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          onboardingCompleted: user.onboardingCompleted,
+          // Partial profile data if available
+          ...(nutritionProfile && {
+            age: nutritionProfile.age,
+            gender: nutritionProfile.gender,
+            height: nutritionProfile.height,
+            weight: nutritionProfile.weight,
+            activityLevel: nutritionProfile.activityLevel,
+            goal: nutritionProfile.goal,
+            dietaryRestrictions: nutritionProfile.dietaryRestrictions ?? [],
+          }),
+          foodPreferences: foodPreferences?.map((fp) => ({
+            foodName: fp.foodName,
+            liked: fp.liked,
+          })) ?? [],
+        },
+      })
+    }
+
+    // Full User with complete nutritionProfile
     return response.ok({
-      user,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        onboardingCompleted: user.onboardingCompleted,
+        nutritionProfile: nutritionProfile
+          ? {
+              age: nutritionProfile.age!,
+              gender: nutritionProfile.gender!,
+              height: nutritionProfile.height!,
+              weight: nutritionProfile.weight!,
+              activityLevel: nutritionProfile.activityLevel!,
+              goal: nutritionProfile.goal!,
+              dietaryRestrictions: nutritionProfile.dietaryRestrictions ?? [],
+              // Nutrition intake values
+              bmr: nutritionProfile.bmr!,
+              tdee: nutritionProfile.tdee!,
+              caloriesConsumption: nutritionProfile.dailyCaloriesConsumption!,
+              proteinsIntake: nutritionProfile.proteinIntake!,
+              carbsIntake: nutritionProfile.carbsIntake!,
+              fatIntake: nutritionProfile.fatIntake!,
+            }
+          : null,
+        foodPreferences: foodPreferences?.map((fp) => ({
+          foodName: fp.foodName,
+          liked: fp.liked,
+        })) ?? [],
+      },
     })
   }
 
