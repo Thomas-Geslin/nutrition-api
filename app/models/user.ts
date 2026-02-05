@@ -9,6 +9,7 @@ import type { HasOne, HasMany } from '@adonisjs/lucid/types/relations'
 
 import UserNutritionProfile from '#models/user_nutrition_profile'
 import UserFoodPreference from '#models/user_food_preferences'
+import Menu from '#models/menu'
 
 /** Basic USER class for auth and identity */
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
@@ -47,6 +48,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => UserFoodPreference)
   declare foodPreferences: HasMany<typeof UserFoodPreference>
+
+  @hasMany(() => Menu)
+  declare menus: HasMany<typeof Menu>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 }
