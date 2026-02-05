@@ -56,3 +56,13 @@ router
       .use([middleware.cookieAuth(), middleware.auth()])
   })
   .prefix('/user')
+
+/**
+ * Menu generation endpoints
+ */
+const MenuController = () => import('#controllers/menu')
+
+router
+  .post('/menus/generate', [MenuController, 'generate'])
+  .use([middleware.cookieAuth(), middleware.auth()])
+
