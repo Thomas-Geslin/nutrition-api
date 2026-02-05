@@ -66,3 +66,9 @@ router
   .post('/menus/generate', [MenuController, 'generate'])
   .use([middleware.cookieAuth(), middleware.auth()])
 
+/**
+ * Food endpoints
+ */
+const FoodController = () => import('#controllers/food')
+
+router.get('/foods', [FoodController, 'getAllFoods'])
